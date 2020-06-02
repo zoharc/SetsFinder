@@ -1,0 +1,144 @@
+---
+swagger: "2.0"
+info:
+  description: "This service will help you find the sets you need to know"
+  version: "1.0.0"
+  title: "Similar Sets Finder"
+host: "petstore.swagger.io"
+basePath: "/v1"
+schemes:
+- "https"
+- "http"
+paths:
+  /findSets:
+    get:
+      tags:
+      - "find similar sets"
+      summary: "Find sets that include given artists"
+      operationId: "find_sets_get"
+      parameters:
+      - name: "artists"
+        in: "query"
+        description: "Artists to find in similar sets"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+        collectionFormat: "multi"
+      - name: "max_sets"
+        in: "query"
+        description: "Max number of similar sets to display"
+        required: false
+        type: "integer"
+        default: 10
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/SetsAndOccurrencesData"
+        "204":
+          description: "No results found"
+        "500":
+          description: "Internal Server Error"
+      x-swagger-router-controller: "swagger_server.controllers.find_similar_sets_controller"
+  /findSetsByMixcloudSets:
+    get:
+      tags:
+      - "Find a similar set to a given mixcloud set"
+      summary: "Find sets that are similar to a given mixcloud set"
+      operationId: "find_sets_by_mixcloud_sets_get"
+      parameters:
+      - name: "sets_urls"
+        in: "query"
+        description: "urls of mixcloud sets to find similar sets to"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+        collectionFormat: "multi"
+      - name: "max_sets"
+        in: "query"
+        description: "Max number of similar sets to display"
+        required: false
+        type: "integer"
+        default: 10
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/SetsAndOccurrencesData"
+        "204":
+          description: "No results found"
+        "500":
+          description: "Internal Server Error"
+      x-swagger-router-controller: "swagger_server.controllers.find_a_similar_set_to_a_given_mixcloud_set_controller"
+  /insertSetDetails:
+    post:
+      tags:
+      - "insert set details to sets db"
+      summary: "Insert set details and tracks information to sets db"
+      operationId: "insert_set_details_post"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Set data"
+        required: true
+        schema:
+          $ref: "#/definitions/SetData"
+      responses:
+        "200":
+          description: "successful operation"
+        "500":
+          description: "Internal Server Error"
+      x-swagger-router-controller: "swagger_server.controllers.insert_set_details_to_sets_db_controller"
+definitions:
+  SetData:
+    type: "object"
+    required:
+    - "name"
+    - "source"
+    properties:
+      name:
+        type: "string"
+        example: "Some Set Name"
+      source:
+        type: "string"
+        example: "Some Source"
+      setUrl:
+        type: "string"
+        example: "https://www.somesite.com/someSetName"
+      uploader:
+        type: "string"
+        example: "Some Uploader"
+      setTitle:
+        type: "string"
+        example: "Some Title"
+    example:
+      uploader: "Some Uploader"
+      name: "Some Set Name"
+      setTitle: "Some Title"
+      source: "Some Source"
+      setUrl: "https://www.somesite.com/someSetName"
+  SetsAndOccurrencesData:
+    type: "object"
+    required:
+    - "artistsOccurrences"
+    - "setData"
+    properties:
+      setData:
+        $ref: "#/definitions/SetData"
+      artistsOccurrences:
+        type: "integer"
+        example: 3
+    example:
+      setData:
+        uploader: "Some Uploader"
+        name: "Some Set Name"
+        setTitle: "Some Title"
+        source: "Some Source"
+        setUrl: "https://www.somesite.com/someSetName"
+      artistsOccurrences: 3
